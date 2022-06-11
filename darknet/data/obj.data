@@ -1,0 +1,5 @@
+classes = 1
+train = c:\Users\test\Desktop\PythonWorkspace\sinfonizer/darknet/data/train.txt
+valid = c:\Users\test\Desktop\PythonWorkspace\sinfonizer/darknet/data/valid.txt
+names = c:\Users\test\Desktop\PythonWorkspace\sinfonizer/darknet/data/obj.names
+backup = c:\Users\test\Desktop\PythonWorkspace\sinfonizer/darknet/backup/
