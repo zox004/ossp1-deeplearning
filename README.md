@@ -37,6 +37,6 @@ CRNN(Convolution Recurrent Neural Network) 알고리즘은 합성곱 신경망(C
 
 ### **Process**
 
-- step 1 : YOLO를 이용해 간판 영역에 대한 Bounding Box 검출하도록 학습시킨다.
+- step 1 : YOLO를 이용해 간판 영역에 대한 Bounding Box 검출하도록 학습시킨다. 
 - step 2 : step 1의 결과로 넘어온 Bounding Box 내부에서 상호명 Text Line을 찾도록 학습시킴으로써 문자 탐지 모델을 구축한다.
 - step 3 : step 2에서 Text Line을 이미지로 받은 후 CRNN 알고리즘을 통해 이미지에서 시계열 문자열인 상호명을 인식하도록 학습시킨다.
