@@ -90,18 +90,6 @@ CRNN(Convolution Recurrent Neural Network) 알고리즘은 합성곱 신경망(C
 
   사용자가 이미지를 입력하면 2초 이내에 텍스트를 반환하여야 한다. Test data 에 대해 90% 이상의 정확도가 되어야 한다.
 
-### Use case Diagram
-![image](https://user-images.githubusercontent.com/56228085/175829607-3e49f003-6209-4656-835c-5fe28b2b8d95.png)
-
-### Deployment Diagram
-![image](https://user-images.githubusercontent.com/56228085/175829626-8d67f146-ba26-4b49-97e2-09cbfb2b0a6c.png)
-
-### Class Diagram
-![image](https://user-images.githubusercontent.com/56228085/175829651-b242f667-ce8e-466b-8a56-4bbde10fbeb8.png)
-
-### Sequnce Diagram
-![image](https://user-images.githubusercontent.com/56228085/175829701-d3d3ff86-c2f7-41d0-bf29-d150b720cb07.png)
-
 ## 최종 산출물 구성 형태
 - Application Layer
   - YOLOv4
@@ -118,48 +106,63 @@ CRNN(Convolution Recurrent Neural Network) 알고리즘은 합성곱 신경망(C
 
 ## Risk Analysis & Risk Reduction Plan
 ### 구현 전 예상했던 어려움
-간판 영역 검출에서의 어려움
-: YOLO는 작은 객체에 취약하고, 다른 모델에 비해 다소 정확도가 떨어지는 문제가 발생할 것으로 예상했다. 
-YOLO 마지막 단계에서 NMS(Non Maximum Suppression) 알고리즘을 적용하여 확률이 작은 간판을 제거하여 정확도를 높였다.
+- 간판 영역 검출에서의 어려움
+	YOLO는 작은 객체에 취약하고, 다른 모델에 비해 다소 정확도가 떨어지는 문제가 발생할 것으로 예상했다. 
+	YOLO 마지막 단계에서 NMS(Non Maximum Suppression) 알고리즘을 적용하여 확률이 작은 간판을 제거하여 정확도를 높였다.
 
-구현 및 학습 중 극복한 어려움
-Signboard Detector
-Dataset의 부족
-: 간판 영역의 bounding box 좌표를 이용해 간판 영역을 검출하는 YOLO 모델을 학습시켜야 하는데, 라벨링된 간판 영역 dataset이 없다.
-YOLO Mark를 이용해 직접 라벨링하여 dataset 구축
-(참고 자료 : https://github.com/AlexeyAB/Yolo_mark)
+### 구현 및 학습 중 극복한 어려움
+- Signboard Detector
+	- Dataset의 부족
+	
+		간판 영역의 bounding box 좌표를 이용해 간판 영역을 검출하는 YOLO 모델을 학습시켜야 하는데, 라벨링된 간판 영역 dataset이 없다.
+		-> YOLO Mark를 이용해 직접 라벨링하여 dataset 구축
+		(참고 자료 : https://github.com/AlexeyAB/Yolo_mark)
 
-하나의 이미지에서 여러 간판이 포함된 경우 정확도가 떨어짐
-해당되는 이미지들을 추가로 라벨링하여 학습을 진행해 해결했다.
+	- 하나의 이미지에서 여러 간판이 포함된 경우
 
-Textline Detector
-한글과 영어 혼합 또는 영어 문자열 인식의 어려움
-: 한글과 영어로 혼합된 Text Line을 인식해야하거나, 영어로 구성된 Text Line도 인식해야 하는 경우가 존재하는데, 한글 Text Line만 학습시키면 정확도 측면에서 문제가 생긴다.
-영어 Text Line dataset 추가 확보했다.
-영어 Text Line dataset 선학습을 진행했다.
+		해당되는 이미지들을 추가로 라벨링하여 학습을 진행해 해결했다.
 
-상호명에 해당하는 Text Line 선별 알고리즘
-: YOLO 기반의 Text Line Detector에서 Text Line을 모두 검출한 후, 그 중 상호명에 해당하는 Text Line을 선별해야 하는데 알고리즘이 존재하지 않는다.
-간판 구성 상 상호명에 해당하는 Text Line의 영역이 가장 클 가능성을 이용해 Text Line의 경계 박스 좌표를 이용해 가장 큰 넓이를 구하는 알고리즘 구성했다.
+- Textline Detector
+	- 한글과 영어 혼합 또는 영어 문자열 인식의 어려움
 
-nan loss 발생
-오버플로우, 언더플로우 가능성이 있어 loss 값을 float32에서 float64로 cast하여 표현할 수 있는 loss의 비트 수를 늘렸다.
-sqrt 값으로 0이 들어가 0으로 나누는 경우의 수가 생기기 때문에 loss 값에 1e-9(1nano)를 더해주었다.
-overshooting 가능성이 있어 학습률을 감소시켰다.
+		한글과 영어로 혼합된 Text Line을 인식해야하거나, 영어로 구성된 Text Line도 인식해야 하는 경우가 존재하는데, 한글 Text Line만 학습시키면 정확도 측면에서 문제가 생긴다.
+		
+		영어 Text Line dataset 추가 확보했다.
+		
+		영어 Text Line dataset 선학습을 진행했다.
+
+	- 상호명에 해당하는 Text Line 선별 알고리즘
+
+		YOLO 기반의 Text Line Detector에서 Text Line을 모두 검출한 후, 그 중 상호명에 해당하는 Text Line을 선별해야 하는데 알고리즘이 존재하지 않는다.
+		
+		간판 구성 상 상호명에 해당하는 Text Line의 영역이 가장 클 가능성을 이용해 Text Line의 경계 박스 좌표를 이용해 가장 큰 넓이를 구하는 알고리즘 구성했다.
+
+	- nan loss 발생
+
+		오버플로우, 언더플로우 가능성이 있어 loss 값을 float32에서 float64로 cast하여 표현할 수 있는 loss의 비트 수를 늘렸다.
+		
+		sqrt 값으로 0이 들어가 0으로 나누는 경우의 수가 생기기 때문에 loss 값에 1e-9(1nano)를 더해주었다.
+		
+		overshooting 가능성이 있어 학습률을 감소시켰다.
 
 	
-Text Recognizer
-상호명 영역만 잘린 간판 학습 데이터 부족
-		: 직접 라벨링을 하다보니 sinfonizer의 첫번째, 두번째 단계를 거쳐 결과로서 얻게 되는 상호명 영역         이미지가 많지 않았으며, 무료로 제공되는 데이터셋이 없었다.
-간판 영역 바운딩 박스 위치 라벨링이 제공되는 이미지들을 이용해 상호명 영역과 유사하게 자른 이미지를 생성하도록 파이썬 프로그램을 개발해 사용했다.
+- Text Recognizer
+	- 상호명 영역만 잘린 간판 학습 데이터 부족
+		
+		직접 라벨링을 하다보니 sinfonizer의 첫번째, 두번째 단계를 거쳐 결과로서 얻게 되는 상호명 영역 이미지가 많지 않았으며, 무료로 제공되는 데이터셋이 없었다.
 
+		간판 영역 바운딩 박스 위치 라벨링이 제공되는 이미지들을 이용해 상호명 영역과 유사하게 자른 이미지를 생성하도록 파이썬 프로그램을 개발해 사용했다.
 
+### 남아있는 극복 해야 할 어려움
+- 한글 인식에 대한 어려움
 
-남아있는 극복 해야 할 어려움
-한글 인식에 대한 어려움
-	: 영문과 비교해 분류해야할 글자가 (영문 26 : 한글 900)로 약 35배 정도 차이가 나 같은 양의 데이터와 같은 학습양으로 정확도를 높이는 데에 어려움이 있다. 더불어 한글은 특성상 시계열 데이터이기 때문에 글자가 아닌 일종의 패턴으로 인식하여 검출하기 어려운 특성이 있다.
-Scene text 인식의 어려움
-: 이미지의 해상도, 방향, 그림자 등 여러 자연적인 요소로 인해 시스템 성능이 저하될 수 있다. 또한, 간판 이미지의 특성 상 이미지 내의 색상이 다양하고 글자의 크기와 폰트, 색상 등이 다양하기 때문에 글자 인식이 어려울 수 있다.
-Text 인식 전 이미지 전처리 모듈 구성으로 개선될 것으로 예상된다.
-향후 더 많은 dataset 확보를 통해 성능이 개선될 것으로 예상된다.
+	영문과 비교해 분류해야할 글자가 (영문 26 : 한글 900)로 약 35배 정도 차이가 나 같은 양의 데이터와 같은 학습양으로 정확도를 높이는 데에 어려움이 있다. 더불어 한글은 특성상 시계열 데이터이기 때문에 글자가 아닌 일종의 패턴으로 인식하여 검출하기 어려운 특성이 있다.
+	
+- Scene text 인식의 어려움
+
+	이미지의 해상도, 방향, 그림자 등 여러 자연적인 요소로 인해 시스템 성능이 저하될 수 있다. 또한, 간판 이미지의 특성 상 이미지 내의 색상이 다양하고 글자의 크기와 폰트, 색상 등이 다양하기 때문에 글자 인식이 어려울 수 있다.
+
+	Text 인식 전 이미지 전처리 모듈 구성으로 개선될 것으로 예상된다.
+
+	향후 더 많은 dataset 확보를 통해 성능이 개선될 것으로 예상된다.
 
